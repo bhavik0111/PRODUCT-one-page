@@ -1,7 +1,7 @@
 <?php
 ob_start();
 session_start();
-include "CONNECT.php";
+include "connect1.php";
 
 $action = '';
 
@@ -13,47 +13,60 @@ if (isset($_GET['action'])) {
 
 // insert into database..........
 
-if (isset($_REQUEST["submit"])) 
-{
-  $name        = $_REQUEST["name"];
-  $category_id = $_REQUEST["category_id"];
-  $description = $_REQUEST["description"];
-  $price       = $_REQUEST["price"];
-  //  $image       = $_REQUEST["file"];
-  $status      = $_REQUEST["status"];
+       // $error='';
 
-  // for image 
-  $file     = $_FILES["file"]["name"];
-  $tempname = $_FILES["file"]["tmp_name"];
-  $folder   = "./image/" . time() . $file;
+        if (isset($_POST["submit"])) 
+        {
 
-  // Now let's move the uploaded image into the folder: image
-  if (move_uploaded_file($tempname, $folder)) {
-    $_SESSION['msg'] = "<h3>  Image uploaded successfully!</h3>";
-    header("location:product.php");
-  } else {
-    echo "<h3>  Failed to upload image!</h3>";
-  }
+          $name        = $_REQUEST["name"];
+          $category_id = $_POST["category_id"];
+          $description = $_POST["description"];
+          $price       = $_POST["price"];
+          //  $image       = $_REQUEST["file"];
+          $status      = $_POST["status"];
 
-  $query = "INSERT INTO `product_master` VALUES ('', '$category_id', '$name', '$description', '$price', '$folder', '$status')";
+            // for image 
+            $file     = $_FILES["file"]["name"];
+            $tempname = $_FILES["file"]["tmp_name"];
+            $folder   = "./image/" . time() . $file;
+            
+                
+            
+              if(isset($_FILES["file"]))
+              {
+                if (move_uploaded_file($tempname, $folder)) 
+                {
+                  // $_SESSION['msg'] = "<h3>  Image uploaded successfully!</h3>";
+                  // header("location:product.php");
+                } else {
+                  echo "<h3>  Failed to upload image!</h3>";
+              }
+            
+        
+          // Now let's move the uploaded image into the folder: image
 
-  $result = mysqli_query($conn, $query);
+          $query = "INSERT INTO `product_master` VALUES ('', '$category_id', '$name', '$description', '$price', '$folder', '$status')";
 
-  if ($result) {
-    $_SESSION['msg'] = "<h3> Data inserted into Database successfully </h3>";
-    header("location:product.php");
-  } else {
-    echo "<h4> failed in database </h4>";
-    //echo "Error:". $query . "<br>". $conn->error;
-  }
-}
+          $result = mysqli_query($conn, $query);
 
+          if ($result) {
+            $_SESSION['msg'] = "<h3> Data inserted into Database successfully </h3>";
+            header("location:product.php");
+          } else {
+            echo "<h4> failed in database </h4>";
+            //echo "Error:". $query . "<br>". $conn->error;
+          }
+        }
+        }
 
 
 // Add form
 
 if ($action == 'Add') 
 {
+  $nameErr='';
+  $name = '';
+
 ?>
       <!DOCTYPE html>
       <html>
@@ -61,21 +74,31 @@ if ($action == 'Add')
       <head>
         <title>&#128526; Product form </title>
       </head>
+
       <div class="" align="right">
         <a href="product.php" class="btn btn-outline-info">Back</a>
       </div>
-
       <body>
         <form method="POST" action="product.php?action=Add" enctype="multipart/form-data">
           <table border="1" align="center" cellpadding="15" cellspacing="0">
+
             <tr>
               <th colspan="2">
                 <h2>Add Product </h2>
               </th>
             </tr>
+                     
+            <tr>
+              <th colspan="2" style="color:red">
+                             
+              </th>
+            </tr>
+                     
             <tr>
               <th>name</th>
               <td><input type="text" name="name"></td>
+              <span class="error">* <?php echo $nameErr; ?> </span>  
+              <br><br>  
             </tr>
 
             <?php
@@ -111,7 +134,7 @@ if ($action == 'Add')
 
             <tr>
               <th>image</th>
-              <td><input type="file" name="file"></td>
+              <td><input type="file" name="file" ></td>
             </tr>
 
             <tr>
@@ -131,7 +154,7 @@ if ($action == 'Add')
         <?php
       }
 
-  // update-edit..............
+// update-edit..............
 
       else if (isset($_GET['id']) && $action == 'Edit') 
         {
@@ -201,7 +224,7 @@ if ($action == 'Add')
                   </tr>
 
                   <tr>
-                    <th>file</th>
+                    <th>image</th>
                     <td><input type="file" name="file" value="<?php echo "$file"; ?>"></td>
                   </tr>
 
@@ -227,7 +250,7 @@ if ($action == 'Add')
             }
           }
 
-  //delete.................   
+//delete.................   
 
               else if (isset($_GET['id']) && $action == 'Delete') 
               {
@@ -257,8 +280,7 @@ if ($action == 'Add')
           <head>
             <title>View Page</title>
 
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+              <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
           </head>
 
           <body>
@@ -308,11 +330,11 @@ if ($action == 'Add')
                   <tr>
                     <th>ID</th>
                     <th>category_id</th>
-                    <th><a href="product.php?column=name&order=<?php echo $asc_or_desc; ?>">name</th>
-                    <th><a href="product.php?column=description&order=<?php echo $asc_or_desc; ?>">description</th>
-                    <th><a href="product.php?column=price&order=<?php echo $asc_or_desc; ?>">price</th>
+                    <th><a href="product.php?<?php if (isset($_GET['search'])) {echo 'search='.$_GET['search'].'&';} ?>column=name&order=<?php echo $asc_or_desc; ?>">name</th>
+                    <th><a href="product.php?<?php if (isset($_GET['search'])) {echo 'search='.$_GET['search'].'&';} ?>column=description&order=<?php echo $asc_or_desc; ?>">description</th>
+                    <th><a href="product.php?<?php if (isset($_GET['search'])) {echo 'search='.$_GET['search'].'&';} ?>column=price&order=<?php echo $asc_or_desc; ?>">price</th>
                     <th>image</th>
-                    <th><a href="product.php?column=status&order=<?php echo $asc_or_desc; ?>">status</th>
+                    <th><a href="product.php?<?php if (isset($_GET['search'])) {echo 'search='.$_GET['search'].'&';} ?>column=status&order=<?php echo $asc_or_desc; ?>">status</th>
                     <th>action</th>
                   </tr>
                 </thead>
@@ -339,7 +361,7 @@ if ($action == 'Add')
                         <td><?php echo $row['name']; ?></td>
                         <td><?php echo $row['description']; ?></td>
                         <td><?php echo $row['price']; ?></td>
-                       <td><img src="./image/<?php echo $row['image']; ?>" height="50" width="50"></td>
+                       <td><img src="<?php echo $row['image']; ?>" height="50" width="50"></td>
                         <td><?php echo $row['status']; ?></td>
 
                         <td><a class="btn btn-info" href="product.php?action=Edit&id=<?php echo $row['id']; ?>">Edit</a>&nbsp;
@@ -362,42 +384,56 @@ if ($action == 'Add')
 
 
   <!-- // update query  -->
+  
+ 
   <?php
   if (isset($_POST['update'])) 
-  {
-    $id          = $_GET['id'];
-    $name        = $_POST["name"];
-    $category_id = $_POST["category_id"];
-    $description = $_POST["description"];
-    $price       = $_POST["price"];
-    $status      = $_POST["status"];
+   {
+        $id          = $_GET['id'];
+        $name        = $_POST["name"];
+        $category_id = $_POST["category_id"];
+        $description = $_POST["description"];
+        $price       = $_POST["price"];
+        $status      = $_POST["status"];
+
+        
+            if ($_FILES['file']['name']) 
+            {
+              $filename = $_FILES["file"]["name"];
+              $tempname = $_FILES["file"]["tmp_name"];
+              $folder = "./image/" . $filename;
+
+             // Now let's move the uploaded image into the folder: image
+
+                  if (move_uploaded_file($tempname, $folder)) 
+                  {
+                    echo "<h3>  Image uploaded successfully</h3>";
+                  } 
+                  else 
+                  {
+                    echo "<h3>  Failed to upload image!</h3>";
+                  }
 
 
-    if ($_FILES['file']['name']) {
-      $filename = $_FILES["file"]["name"];
-      $tempname = $_FILES["file"]["tmp_name"];
-      $folder = "./image/" . $filename;
-      // Now let's move the uploaded image into the folder: image
-      if (move_uploaded_file($tempname, $folder)) {
-        echo "<h3>  Image uploaded successfully</h3>";
-      } else {
-        echo "<h3>  Failed to upload image!</h3>";
-      }
+               $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status',image='$folder' WHERE id='$id'";
+            } 
+            else 
+            {
+              $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status' WHERE id='$id'";
+            }
 
-      $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status',image='$filename' WHERE id='$user_id'";
-    } else {
-      $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status' WHERE id='$id'";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result == TRUE) 
+        {
+          $_SESSION['msg'] = "Record updated successfully.";
+
+          header("location:product.php");
+        } 
+        else 
+        {
+          echo "Error:" . $sql . "<br>" . $conn->error;
+        }
     }
-
-
-    $result = mysqli_query($conn, $sql);
-
-    if ($result == TRUE) {
-      $_SESSION['msg'] = "Record updated successfully.";
-
-      header("location:product.php");
-    } else {
-      echo "Error:" . $sql . "<br>" . $conn->error;
-    }
-  }
   ?>
