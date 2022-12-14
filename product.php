@@ -18,7 +18,7 @@ if (isset($_GET['action']))
 // $error='';  msg...
 
  $name = "";
- $category_id = "";
+ $category = "";
  $description = "";
  $price = "";
  $file = "";
@@ -36,11 +36,11 @@ if (isset($_POST["submit"]))
 
 
 
-		  $category_id = $_POST["category_id"];    //............
+		  $category = $_POST["category"];    //............
 
-		  if (empty($_POST['category_id']) || $_POST['category_id'] <= 0) 
+		  if (empty($_POST['category']) || $_POST['category'] <= 0) 
 		  {
-		    $_SESSION['error']['category_id_error'] = "Please Select category_id";
+		    $_SESSION['error']['category_error'] = "Please Select category";
 		  }
 
 
@@ -101,7 +101,7 @@ if (isset($_POST["submit"]))
 
 	      // Now let's move the uploaded image into the folder: image
 
-	      $query = "INSERT INTO `product_master` VALUES ('', '$category_id', '$name', '$description', '$price', '$folder', '$status')";
+	      $query = "INSERT INTO `product_master` VALUES ('', '$category', '$name', '$description', '$price', '$folder', '$status')";
 
 	      $result = mysqli_query($conn, $query);
 
@@ -160,30 +160,50 @@ if ($action == 'Add')
 		</tr>
 
 		<?php
-		$sql = "SELECT * FROM `product_master` WHERE category_id = 0 ";
-		$result = mysqli_query($conn, $sql);
+			$sql = "SELECT * FROM `category` WHERE parent_id=0";
+			$result = mysqli_query($conn, $sql);	
 		?>
-
 		<tr>
-		  <th>category_id</th>
-		  <td><select name="category_id">
+		  <th>category</th>
+		  <td><select name="category">
 		      <option value="0">--select--</option>
+		      
 		      <?php
-		      if ($result->num_rows > 0) {
-		        while ($row = $result->fetch_assoc()) {
+		         if ($result->num_rows > 0) 
+		         {
+		           while ($row = $result->fetch_assoc()) 
+		            {
 		      ?>
-		          <option value="<?php echo $row['id']; ?>" <?php if ($category_id == $row['id']) {
-		                                                      echo "selected";
-		                                                    }
-		                                                    ?>><?php echo $row['name']; ?></option>
-		      <?php
-		        }
-		      }
+		              <option value="<?php echo $row['id']; ?>"<?php if ($category == $row['id']) {
+                                                              echo "selected";
+                                                            }
+                                                            ?> ><?php echo $row['title']; ?></option>
+		          
+		             <?php
+		           
+               //subcategory for dropdown list..............................    
+                           
+		                  $sql_subcat = "SELECT * FROM `category` where parent_id=" . $row['id'];
+
+		                  $result_subcat = mysqli_query($conn, $sql_subcat);
+ 
+	 
+		                  if ($result_subcat->num_rows > 0) 
+		                  {
+		                    while ($row_subcat = $result_subcat->fetch_assoc()) 
+		                    {
+		                      ?>
+		                      <option value="<?php echo $row_subcat['id']; ?>"><?php echo '-->' . $row_subcat['title']; ?></option> 
+		              <?php
+				    }
+				  }
+		            }
+		         }
 		      ?>
 		    </select>
-		    <span style="color:red"><?php if (isset($_SESSION['error']['category_id_error'])) {
-		                              echo '<br>' . $_SESSION['error']['category_id_error'];
-		                              unset($_SESSION['error']['category_id_error']);
+		    <span style="color:red"><?php if (isset($_SESSION['error']['category_error'])) {
+		                              echo '<br>' . $_SESSION['error']['category_error'];
+		                              unset($_SESSION['error']['category_error']);
 		                            } ?></span>
 		  </td>
 		</tr>
@@ -257,20 +277,25 @@ if ($action == 'Add')
 	    unset($_SESSION['error']);
 	  }
 
-  // update-edit..............
+
+
+
+// update-edit..............
 
 	  else if (isset($_GET['id']) && $action == 'Edit') 
-	   {
+	  {
 		    $id = $_GET['id'];
 
-		    $sql1 = "SELECT * FROM  `product_master`  WHERE `id`='$id'";
+		   $sql1 = "SELECT * FROM  `product_master`  WHERE `id`='$id'";
 		    // $result=mysqli_query($conn, $sql1);
 		    $result1 = $conn->query($sql1);
 
-		    if ($result1->num_rows > 0) {
-		      while ($row = $result1->fetch_assoc()) {
+		    if ($result1->num_rows > 0) 
+        {
+		      while ($row = $result1->fetch_assoc()) 
+          {
 			$name        = $row["name"];
-			$category_id = $row["category_id"];
+			$category    = $row["category"];
 			$description = $row["description"];
 			$price       = $row["price"];
 			$status      = $row["status"];
@@ -294,22 +319,40 @@ if ($action == 'Add')
 			  </tr>
 
 			  <?php
-			  $sql = "SELECT * FROM `product_master` WHERE category_id = 0 ";
+			  $sql = "SELECT * FROM `category` WHERE parent_id = 0 ";
 			  $result = mysqli_query($conn, $sql);
 			  ?>
 			  <tr>
-			    <th>category_id</th>
-			    <td><select name="category_id">
+			    <th>category</th>
+			    <td><select name="category" >
 				<option value="0">--select--</option>
 				<?php
 				if ($result->num_rows > 0) {
 				  while ($row = $result->fetch_assoc()) {
 				?>
-				    <option value="<?php echo $row['id']; ?>" <?php if ($category_id == $row['id']) {
-				                                                echo "selected";
-				                                              }
-				                                              ?>><?php echo $row['name']; ?></option>
+				    <option value="<?php echo $row['id']; ?>"<?php if ($category == $row['id']) {
+                                                              echo "selected";
+                                                            }
+                                                            ?>><?php echo $row['title']; ?></option> 
+				                                              
+          <?php
+
+               //subcategory for dropdown list..............................    
+                           
+                      $sql_subcat = "SELECT * FROM `category` where parent_id=" . $row['id'];
+
+                      $result_subcat = mysqli_query($conn, $sql_subcat);
+ 
+   
+                      if ($result_subcat->num_rows > 0) 
+                      {
+                        while ($row_subcat = $result_subcat->fetch_assoc()) 
+                        {
+                          ?>
+                          <option value="<?php echo $row_subcat['id']; ?>"><?php echo '-->' . $row_subcat['title']; ?></option> 
 				<?php
+                        }
+                      }
 				  }
 				}
 				?>
@@ -442,14 +485,14 @@ if ($action == 'Add')
 
 
 		    //parent_id 0,0,0,0 convert to name mobile,laptop,car.......etc 
-		    $sql = "SELECT product_master.id, product_master.category_id, product_master.name, product_master.description, product_master.price,product_master.image,product_master.status, b.name as category_id FROM product_master LEFT JOIN product_master b ON (product_master.category_id = b.id)";
+		    $sql = "SELECT product_master.id, product_master.category, product_master.name, product_master.description, product_master.price,product_master.image,product_master.status, b.title as category FROM product_master LEFT JOIN category b ON (product_master.category = b.id)";
 
 
 		    if (isset($_GET['search'])) {
 		      $search_var = $_GET['search'];
 
 
-		      $sql = "SELECT product_master.id, product_master.category_id, product_master.name, product_master.description, product_master.price,product_master.image,product_master.status, b.name as category_id FROM product_master LEFT JOIN product_master b ON (product_master.category_id = b.id) WHERE (product_master.name like '%" . $search_var . "%')";
+		      $sql = "SELECT product_master.id, product_master.category, product_master.name, product_master.description, product_master.price,product_master.image,product_master.status, b.title as category FROM product_master LEFT JOIN category b ON (product_master.category = b.id) WHERE (product_master.name like '%" . $search_var . "%')";
 		    }
 
 		    ?>
@@ -457,7 +500,9 @@ if ($action == 'Add')
 		    <thead>
 		      <tr>
 		        <th>ID</th>
-		        <th>category_id</th>
+		        <th><a href="product.php?<?php if (isset($_GET['search'])) {
+                                        echo 'search=' . $_GET['search'] . '&';
+                                      } ?>column=name&order=<?php echo $asc_or_desc; ?>">category</th>
 		        <th><a href="product.php?<?php if (isset($_GET['search'])) {
 		                                    echo 'search=' . $_GET['search'] . '&';
 		                                  } ?>column=name&order=<?php echo $asc_or_desc; ?>">name</th>
@@ -491,7 +536,7 @@ if ($action == 'Add')
 		      ?>
 		          <tr>
 		            <td><?php echo $row['id']; ?></td>
-		            <td><?php echo $row['category_id']; ?></td>
+		            <td><?php echo $row['category']; ?></td>
 		            <td><?php echo $row['name']; ?></td>
 		            <td><?php echo $row['description']; ?></td>
 		            <td><?php echo $row['price']; ?></td>
@@ -523,7 +568,7 @@ if ($action == 'Add')
 	  if (isset($_POST['update'])) {
 	    $id          = $_GET['id'];
 	    $name        = $_POST["name"];
-	    $category_id = $_POST["category_id"];
+	    $category = $_POST["category"];
 	    $description = $_POST["description"];
 	    $price       = $_POST["price"];
 	    $status      = $_POST["status"];
@@ -559,9 +604,9 @@ if ($action == 'Add')
 
 
 
-      $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status',image='$folder' WHERE id='$id'";
+      $sql = "UPDATE `product_master` SET name='$name',category='$category',description='$description',price='$price',status='$status',image='$folder' WHERE id='$id'";
     } else {
-      $sql = "UPDATE `product_master` SET name='$name',category_id='$category_id',description='$description',price='$price',status='$status' WHERE id='$id'";
+      $sql = "UPDATE `product_master` SET name='$name',category='$category',description='$description',price='$price',status='$status' WHERE id='$id'";
     }
 
 
