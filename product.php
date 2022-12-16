@@ -479,7 +479,7 @@ else
                             {
                                 $page_no = 1;
                             }
-                            $total_records_per_page = 2;
+                            $total_records_per_page = 5;
                             $offset = ($page_no-1) * $total_records_per_page;
                             $previous_page = $page_no - 1;
                             $next_page = $page_no + 1;
@@ -506,61 +506,82 @@ else
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th><a href="product.php?<?php if (isset($_GET['search'])) {
-                                            echo 'search=' . $_GET['search'] . '&';
-        } ?>column=name&order=<?php echo $asc_or_desc; ?>">category</th>
-                            <th><a href="product.php?<?php if (isset($_GET['search'])) {
-                                                    echo 'search=' . $_GET['search'] . '&';
-        } ?>column=name&order=<?php echo $asc_or_desc; ?>">name</th>
-                            <th><a href="product.php?<?php if (isset($_GET['search'])) {
-                                                    echo 'search=' . $_GET['search'] . '&';
-        } ?>column=description&order=<?php echo $asc_or_desc; ?>">description</th>
-                            <th><a href="product.php?<?php if (isset($_GET['search'])) {
-                                                    echo 'search=' . $_GET['search'] . '&';
-        } ?>column=price&order=<?php echo $asc_or_desc; ?>">price</th>
+
+                            <th><a href="product.php?<?php if (isset($_GET['search'])) 
+                                                            {
+                                                              echo 'search=' . $_GET['search'] . '&';
+                                                            } ?>column=name&order=<?php echo $asc_or_desc; ?>"> category </th>
+
+
+                            <th><a href="product.php?<?php if (isset($_GET['search'])) 
+                                                            {
+                                                               echo 'search=' . $_GET['search'] . '&';
+                                                            } ?>column=name&order=<?php echo $asc_or_desc; ?>"> name </th>
+
+
+                            <th><a href="product.php?<?php if (isset($_GET['search'])) 
+                                                            {
+                                                               echo 'search=' . $_GET['search'] . '&';
+                                                            } ?>column=description&order=<?php echo $asc_or_desc; ?>"> description </th>
+
+
+                            <th><a href="product.php?<?php if (isset($_GET['search'])) 
+                                                            {
+                                                               echo 'search=' . $_GET['search'] . '&';
+                                                            } ?>column=price&order=<?php echo $asc_or_desc; ?>"> price </th>
+
+
                             <th>image</th>
-                            <th><a href="product.php?<?php if (isset($_GET['search'])) {
-                                                    echo 'search=' . $_GET['search'] . '&';
-        } ?>column=status&order=<?php echo $asc_or_desc; ?>">status</th>
+
+
+                            <th><a href="product.php?<?php if (isset($_GET['search'])) 
+                                                            {
+                                                               echo 'search=' . $_GET['search'] . '&';
+                                                            } ?>column=status&order=<?php echo $asc_or_desc; ?>"> status </th>
+
+
                             <th>action</th>
                         </tr>
                     </thead>
                     <tbody>
+
                         <?php
 
-
-
-                        if (isset($_GET['order'])) {
+                        if (isset($_GET['order'])) 
+                         {
                             $sql = $sql . ' ORDER BY ' . $column . ' ' . $sort_order;
-                        }
+                         }
 
-                        $sql = $sql . ' LIMIT '.$offset.','.$total_records_per_page;
+                            $sql = $sql . ' LIMIT '.$offset.','.$total_records_per_page;
+  
+                              $result = mysqli_query($conn, $sql);
 
-                        $result = mysqli_query($conn, $sql);
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                ?>
-                        <tr>
-                            <td><?php echo $row['id']; ?></td>
-                            <td><?php echo $row['category']; ?></td>
-                            <td><?php echo $row['name']; ?></td>
-                            <td><?php echo $row['description']; ?></td>
-                            <td><?php echo $row['price']; ?></td>
-                            <td><img src="<?php echo $row['image']; ?>" height="50" width="50"></td>
-                            <td><?php echo $row['status']; ?></td>
+                             if ($result->num_rows > 0) 
+                             {
+                               while ($row = $result->fetch_assoc()) 
+                               {
+                        ?>
+                                    <tr>
+                                        <td><?php echo $row['id']; ?></td>
+                                        <td><?php echo $row['category']; ?></td>
+                                        <td><?php echo $row['name']; ?></td>
+                                        <td><?php echo $row['description']; ?></td>
+                                        <td><?php echo $row['price']; ?></td>
+                                        <td><img src="<?php echo $row['image']; ?>" height="50" width="50"></td>
+                                        <td><?php echo $row['status']; ?></td>
 
-                            <td><a class="btn btn-info"
-                                    href="product.php?action=Edit&id=<?php echo $row['id']; ?>">Edit</a>&nbsp;
+                                        <td><a class="btn btn-info"
+                                                href="product.php?action=Edit&id=<?php echo $row['id']; ?>">Edit</a>&nbsp;
 
-                                <a class="btn btn-danger"
-                                    href="product.php?action=Delete&id=<?php echo  $row['id']; ?>">Delete</a>
-                            </td>
-                        </tr>
+                                            <a class="btn btn-danger"
+                                                href="product.php?action=Delete&id=<?php echo  $row['id']; ?>">Delete</a>
+                                        </td>
+                                    </tr>
                         <?php
-                            }
-                        }
+                                }
+                             }
                     
-                ?>
+                        ?>
                     </tbody>
                 </table>
 
