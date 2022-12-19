@@ -1,6 +1,6 @@
 <?php
   include("connect.php");
-  
+  $action = ''; 
  
 ?>
             <!DOCTYPE html>
@@ -12,7 +12,7 @@
             </head>
 
             <body>
-                <form method="POST">
+                <form method="POST" action="order.php?action=Add">
                     <table border="1" align="center" cellpadding="15" cellspacing="0">
 
                         <tr>
@@ -20,6 +20,10 @@
                                 <h2>Order </h2>
                             </th>
                         </tr>
+
+                            <div class="" align="right">
+                                <a href="order.php?action=Add" class="btn btn-outline-success">Add+</a>
+                            </div>
 
                         <tr>
                             <th>Order_Number</th>
@@ -78,6 +82,62 @@
                         </tr>
 
                     </table>
+
+                   <?php
+
+                   if ($action == 'Add') 
+                    {
+                            
+                                    $sql = "SELECT * FROM `product_master` WHERE $name";
+                                    $result = mysqli_query($conn, $sql);    
+                                    
+                            ?>
+
+                         <tr>
+                            <th>Product_name</th>
+                                <td><select name="Product_name">
+                                    <option value="0">--select--</option>
+                                        <?php
+                                                if ($result->num_rows > 0) 
+                                                {
+                                                    while ($row = $result->fetch_assoc()) 
+                                                    {
+                                        ?>
+                                                      <option value="<?php echo $row['id']; ?>"><?php echo $row['title']; ?></option>
+                                                    <?php 
+                                                    }
+                                                }    
+                                                    ?>
+                                </td>
+                        </tr>
+
+                         <tr>
+                            <th>Price</th>
+                            <td><input type="text" name="Price"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Qty</th>
+                            <td><input type="text" name="Qty" ></td>
+                        </tr>
+
+                         <tr>
+                            <th>Discount</th>
+                            <td><input type="text" name="Discount"></td>
+                        </tr>
+
+                         <tr>
+                            <th>Total</th>
+                            <td><input type="text" name="Total"></td>
+                        </tr>
+
+                    <?php 
+                    }
+                    ?>
+
+
+
+
                 </form>
             </body>
         </html>
@@ -100,6 +160,7 @@
    if($result)
    {
     echo "<h3> Data inserted into Database successfully </h3>";
+    header("refresh:3");
    }
    else
    {
