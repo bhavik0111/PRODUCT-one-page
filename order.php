@@ -21,9 +21,9 @@
                             </th>
                         </tr>
 
-                            <div class="" align="right">
+                            <!-- <div class="" align="right">
                                 <a href="order.php?action=Add" class="btn btn-outline-success">Add+</a>
-                            </div>
+                            </div> -->
 
                         <tr>
                             <th>Order_Number</th>
@@ -75,70 +75,94 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td colspan="2" align="center"><input type="submit" name="submit">
-                                <input type="reset" name="clear" value="clear">
-                            </td>
-                        </tr>
+                       
 
                     </table>
 
                    <?php
-
-                   if ($action == 'Add') 
-                    {
                             
-                                    $sql = "SELECT * FROM `product_master` WHERE $name";
+                                    $sql = "SELECT * FROM `product_master`";
                                     $result = mysqli_query($conn, $sql);    
                                     
                             ?>
-
-                         <tr>
+                        <table border="1" align="center" cellpadding="15" cellspacing="0" style="margin-top:5px;">
+                        <tr style="text-align:left;min-width:50">
                             <th>Product_name</th>
-                                <td><select name="Product_name">
+                            <th>Price</th>
+                            <th>Discount</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr class="tr">
+                                <td><select name="Product_name" class="Product_name">
                                     <option value="0">--select--</option>
                                         <?php
-                                                if ($result->num_rows > 0) 
+                                            if ($result->num_rows > 0) 
+                                            {
+                                                while ($row = $result->fetch_assoc()) 
                                                 {
-                                                    while ($row = $result->fetch_assoc()) 
-                                                    {
+                                                ?>
+                                                    <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
+                                                <?php 
+                                                }
+                                            }    
                                         ?>
-                                                      <option value="<?php echo $row['id']; ?>"><?php echo $row['title']; ?></option>
-                                                    <?php 
-                                                    }
-                                                }    
-                                                    ?>
+                                    </select>
                                 </td>
-                        </tr>
-
-                         <tr>
-                            <th>Price</th>
-                            <td><input type="text" name="Price"></td>
-                        </tr>
-
-                        <tr>
-                            <th>Qty</th>
+                            <td><input type="text" name="Price" class="Product_price"></td>
                             <td><input type="text" name="Qty" ></td>
-                        </tr>
-
-                         <tr>
-                            <th>Discount</th>
                             <td><input type="text" name="Discount"></td>
-                        </tr>
-
-                         <tr>
-                            <th>Total</th>
                             <td><input type="text" name="Total"></td>
+                            <td><button type="button" id="AddProduct">Add</button></td>
+
                         </tr>
-
-                    <?php 
-                    }
-                    ?>
-
-
-
+                        <tr>
+                            <td colspan="6" align="center">
+                                <input type="submit" name="submit">
+                                <input type="reset" name="clear" value="clear">
+                            </td>
+                        </tr>
+                    </table>
 
                 </form>
+
+                <script src="./script.js"></script>
+                <script>
+                     
+                     $('#AddProduct').on('click', function(){
+                       var html = '<tr><td><select name="Product_name" class="Product_name"><option value="0">--select--</option>'+
+                       '<option value="<?php echo '1';?>">'+
+                       '<?php echo 'hjkb'; ?></option>'+
+                        '</select></td><td><input type="text" name="Price" class="Product_price"></td>'+
+                        '<td><input type="text" name="Qty" ></td><td><input type="text" name="Discount"></td><td><input type="text" name="Total"></td><td><a class="DeleteProduct">Delete</a></td></tr>';
+                        console.log(html);
+                                 $('.tr').last().after(html);
+                     });
+
+                    $('.Product_name').on('change',function(){
+                        var product_id = $(this).val();
+                        var price_input = $(this).closest('td').siblings().find('.Product_price');
+                        console.log(price_input);
+                        $.ajax({
+                            type: 'POST',
+                            url: './getProductPrice.php',
+                            data: {'product_id':product_id}
+                        })
+                        .done(function(response) {
+                            // demonstrate the response
+                            if(response.length) {
+                                var html  = '';
+                                var res = $.parseJSON(response);
+                                price_input.val(res.price);
+                            }
+                        })
+                        .fail(function() {
+                            // if posting your form failed
+                            alert("Posting failed.");
+                        });
+                    });
+                </script>
             </body>
         </html>
 <?php
