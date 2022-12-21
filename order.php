@@ -76,7 +76,7 @@ session_start();
 
             foreach ( $_POST['Product_name'] as $key => $value) 
             {
-                $value_query = mysqli_query($conn, "INSERT INTO `order_products` (Order_id,Order_Details_id, Product_id,Qty,Price,Discount,Total) VALUES ('".$last_id."','','".$_POST['Product_name'][$key]."', '".$_POST['Price'][$key]."','".$_POST['Qty'][$key]."', '".$_POST['Discount'][$key]."', '".$_POST['Total'][$key]."')");
+                $value_query = mysqli_query($conn, "INSERT INTO `order_products` (Order_Details_id, Order_id, Product_id, Price, Discount, Qty, Total) VALUES ('".$last_id."','','".$_POST['Product_name'][$key]."', '".$_POST['Price'][$key]."','".$_POST['Discount'][$key]."', '".$_POST['Qty'][$key]."', '".$_POST['Total'][$key]."')");
             }
 
             /*
@@ -249,9 +249,9 @@ unset($_SESSION['error']);
                             
                             <td><input type="text" name="Price[]" class="Product_price"></td>
                             
-                            <td><input type="text" name="Qty[]" ></td>
-                            
                             <td><input type="text" name="Discount[]"></td>
+                            
+                            <td><input type="text" name="Qty[]" ></td>
                             
                             <td><input type="text" name="Total[]"></td>
 
